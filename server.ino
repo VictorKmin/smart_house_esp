@@ -114,7 +114,6 @@ void setup() {
 
 void loop(){
   //heaterHandler(); //no need to ping it all the time
-
 //    Serial.print("Value: ");
 //    Serial.println(my_pwm.getValue());
 //    delay(1000);
