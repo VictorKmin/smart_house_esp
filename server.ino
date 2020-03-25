@@ -1,12 +1,12 @@
 // Import required libraries
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
-#include <Hash.h>
-#include <ESPAsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-#include <ESP8266HTTPClient.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
+#include <ESP8266HTTPClient.h>
+#include <ESPAsyncTCP.h>
+#include <ESP8266WiFi.h>
+#include <Hash.h>
+#include <ESPAsyncWebServer.h>
 
 // Replace with your network credentials
 const char* ssid = "Kolya";
@@ -133,7 +133,7 @@ String getJSON(){
 
 void led_info(int pin) {
     digitalWrite(pin, HIGH);
-    delay(3000);
+    delay(200);
     digitalWrite(pin, LOW);
 }
 
@@ -148,7 +148,7 @@ void setup(){
   WiFi.begin(ssid, password);
   Serial.println("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(500);
     Serial.println(".");
   }
 
@@ -169,18 +169,20 @@ void setup(){
 
   server.on("/get-data", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "applicatiion/json", String(getJSON()).c_str());
-    led_info(LED_GET_JSON_INFO);
+    led_info(LED_GET_INFO);
   });
 // Start server
   server.begin();
-  http.begin(client, "http://" SERVER_IP "/module"); //HTTP
+  http.begin(client, "http://" SERVER_IP "/module");
 }
 
 void loop(){
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
-
+    http.addHeader("Content-Type", "application/json");
     http.POST(getJSON());
+    led_info(LED_GET_JSON_INFO);
+
     // save the last time you updated the DHT values
     previousMillis = currentMillis;
     float newT = dht.readTemperature();
